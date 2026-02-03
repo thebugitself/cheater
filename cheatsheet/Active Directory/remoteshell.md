@@ -25,9 +25,9 @@ psexec.py <Domain>/<Username>:<Password>@<IP>
 ## nxc - command execution
 #plateform/linux #target/remote #port/445 #protocol/smb #cat/ATTACK/COMMAND-EXECUTION
 Note:
-<Creds_Options> can be either -p (for password) or -H (for NT hash)
+<Creds_Options> can be -p (password), -H (NT hash), or -p -k (Kerberos ticket)
 <Terminal_Options> can be either -x (for cmd) or -X (for powershell)
 
 ```bash
-nxc smb <IP> -u <Username> <Creds_Options> <Password> <Terminal_Options> '<command>'
+nxc smb <IP> -u <Username> <Creds_Options|-p|-H|-p -k> <Password> <Terminal_Options> '<command>'
 ```

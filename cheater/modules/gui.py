@@ -1072,7 +1072,10 @@ class ArgslistMenu:
             self.draw_desc_preview(argprev, padding_text_border, desc_pos, description_lines)
             
             # Show @ shortcut info and CWD on the top inside row (reserved)
+            has_choices = bool(getattr(Gui.cmd, 'arg_choices', {}))
             file_picker_info = "@: File Picker"
+            if has_choices:
+                file_picker_info += " | Shift+O: Auth choice"
             cwd_info = f"CWD: {config.ORIGINAL_CWD}"
             info_row = 1
             info_x = padding_text_border
@@ -1147,6 +1150,56 @@ class ArgslistMenu:
         # update cursor position
         self.xcursor = self.x_init + len(autocompleted_argument)
 
+    def open_choice_popup(self, stdscr):
+        """
+        Open a popup to select from predefined choices for the current argument
+        """
+        choices = getattr(Gui.cmd, 'arg_choices', {}).get(self.current_arg)
+        if not choices:
+            return False
+
+        labels = getattr(Gui.cmd, 'arg_choice_labels', {}).get(self.current_arg)
+        display_items = labels if labels and len(labels) == len(choices) else choices
+
+        height, width = stdscr.getmaxyx()
+        box_width = min(max(len(item) for item in display_items) + 6, width - 4)
+        box_height = min(len(display_items) + 4, height - 4)
+        start_y = (height - box_height) // 2
+        start_x = (width - box_width) // 2
+
+        win = curses.newwin(box_height, box_width, start_y, start_x)
+        win.keypad(True)
+
+        selected = 0
+        current_val = Gui.cmd.args[self.current_arg][1]
+        if current_val in choices:
+            selected = choices.index(current_val)
+
+        while True:
+            win.clear()
+            draw_custom_border(win, 0, 0, box_height, box_width)
+            title = "Select Authentication"
+            win.addstr(1, 2, Gui.draw_string(title, box_width - 4), curses.color_pair(Gui.INFO_NAME_COLOR))
+
+            for i, item in enumerate(display_items[:box_height - 4]):
+                prefix = "> " if i == selected else "  "
+                color = Gui.COL4_COLOR_SELECT if i == selected else Gui.BASIC_COLOR
+                win.addstr(2 + i, 2, Gui.draw_string(prefix + item, box_width - 4), curses.color_pair(color))
+
+            win.refresh()
+            c = win.getch()
+            if c in (curses.KEY_ENTER, 10, 13):
+                Gui.cmd.args[self.current_arg][1] = choices[selected]
+                if self.x_init is not None:
+                    self.xcursor = self.x_init + len(Gui.cmd.args[self.current_arg][1])
+                return True
+            if c in (27, curses.KEY_F10):
+                return False
+            if c == curses.KEY_UP:
+                selected = (selected - 1) % len(display_items)
+            elif c == curses.KEY_DOWN:
+                selected = (selected + 1) % len(display_items)
+
     def run(self, stdscr):
         """
         Arguments selection menu processing..
@@ -1201,6 +1254,10 @@ class ArgslistMenu:
                         stdscr.clear()
                     except Exception as e:
                         pass  # Silently fail if file picker has issues
+            elif c == ord('O'):
+                # Shift+O: Open choices popup if defined
+                if Gui.cmd.args:
+                    self.open_choice_popup(stdscr)
             elif c == 20:
                 try:
                     from pyfzf.pyfzf import FzfPrompt
