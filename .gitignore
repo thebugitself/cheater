@@ -1,2 +1,6 @@
 .vscode/
 git-push.sh
+requirements.txt
+env
+tests/
+verify.sh
