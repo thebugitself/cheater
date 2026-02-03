@@ -108,3 +108,11 @@ Note: Use Shift+O to select authentication method
 ```bash
 nxc smb <IP> -u <Username> <Creds_Options|-p|-H|-k -p> <Password> -M change-password -o USER=<Target_Username> NEWPASS=<New_Password>
 ```
+
+## nxc - Generate TGT
+#plateform/linux #target/remote #port/445 #protocol/smb #cat/ATTACK/PRIVILEGE-ESCALATION
+Note: Use Shift+O to select authentication method
+
+```bash
+nxc smb <IP> -u <Username> <Creds_Options|-p|-H|-k -p> <Password> --generate-tgt <Username>
+```
