@@ -15,7 +15,7 @@ from os.path import expanduser
 # You can add multiple paths, use absolute paths or ~ for home directory
 
 CHEATSHEET_PATHS = [
-    "~/.cheats",  # Default: cheatsheet folder in project
+    "./cheatsheet",  # Project cheatsheet folder
     # Add more paths below:
     # "~/my-cheats",
     # "/usr/share/cheats",

@@ -4,3 +4,10 @@ requirements.txt
 env
 tests/
 verify.sh
+
+# Important: Include these in git
+# !LICENSE
+# !NOTICE  
+# !AUTHORS
+# !README.md
+# !config/config.py

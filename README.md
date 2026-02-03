@@ -2,7 +2,7 @@
 
 A modern pentesting command launcher with improved features and clean interface.
 
-**Based on [Arsenal](https://github.com/Orange-Cyberdefense/arsenal)** by Orange Cyberdefense.
+**Derivative work of [Arsenal](https://github.com/Orange-Cyberdefense/arsenal)** by Orange Cyberdefense - licensed under GPLv3.
 
 ## Features
 
@@ -32,11 +32,15 @@ A modern pentesting command launcher with improved features and clean interface.
 git clone https://github.com/lainonz/cheater.git
 cd cheater
 
+# Create virtual environment
+python3 -m venv env
+source env/bin/activate  # On Windows: env\Scripts\activate
+
 # Install dependencies
 pip3 install -r requirements.txt
 
-# Setup configuration (optional but recommended)
-./setup_config.sh
+# Edit configuration
+nano config/config.py
 
 # Run cheater
 ./run
@@ -44,22 +48,25 @@ pip3 install -r requirements.txt
 
 ## Configuration
 
-Cheater now supports configuration files! Configure your cheatsheet paths, formats, and behavior without editing source code.
+Edit `config/config.py` to customize your settings:
 
-```bash
-# Quick setup
-./setup_config.sh
+```python
+# Set your cheatsheet directories
+CHEATSHEET_PATHS = [
+    "~/cheatsheet",
+    "~/my-cheats",
+]
 
-# View configuration
-python3 cheater_config.py show
+# Choose file formats
+FORMATS = ["md", "rst", "yml"]
 
-# Edit configuration
-python3 cheater_config.py edit
+# Exclude directories (important!)
+EXCLUDE_DIRECTORIES = [
+    "env", "venv", ".git", "__pycache__",
+]
 ```
 
-**Config file location:** `~/.config/cheater/config.yml`
-
-See [CONFIGURATION.md](CONFIGURATION.md) for complete documentation.
+See [config/README.md](config/README.md) for complete configuration guide.
 
 ## Usage
 
@@ -105,12 +112,16 @@ See [CONFIGURATION.md](CONFIGURATION.md) for complete documentation.
 Place your cheatsheets in the root directory:
 - `Active Directory/`
 - `Network/`
-- `Password Cracking/`
-- etc.
+This project is licensed under the **GNU General Public License v3.0** - see the [LICENSE](LICENSE) file for details.
 
-Supported formats: `.md`, `.rst`, `.yml`
+### License Attribution
 
-## License
+Cheater is a derivative work of [Arsenal](https://github.com/Orange-Cyberdefense/arsenal) by [Orange Cyberdefense](https://www.orange-cyberdefense.com/), which is also licensed under GPLv3.
+
+## Credits
+
+- **Original Project**: [Arsenal](https://github.com/Orange-Cyberdefense/arsenal) by Orange Cyberdefense
+- **Derivative Work**: Cheater - Improved features and rewrite
 
 GPLv3 - See LICENSE file
 

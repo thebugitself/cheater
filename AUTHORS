@@ -1,0 +1,45 @@
+AUTHORS
+
+Cheater Project
+
+Original Work:
+==============
+Arsenal
+- Created by: Orange Cyberdefense
+- Project: https://github.com/Orange-Cyberdefense/arsenal
+- License: GNU General Public License v3.0
+
+Derivative Work:
+================
+Cheater
+- Rewrite and improvements: lainonz
+- Repository: https://github.com/lainonz/cheater
+- License: GNU General Public License v3.0 (inherits from Arsenal)
+
+Contributors and Attribution:
+=============================
+- Orange Cyberdefense: Original Arsenal framework and design
+- Arsenal community: Feedback and contributions to original project
+- Cheater community: Feedback and improvements to derivative work
+
+Project Goals:
+==============
+The Cheater project aims to:
+- Improve user experience and interface of Arsenal
+- Add modern features and better configuration
+- Maintain GPLv3 compliance
+- Support the cybersecurity community
+
+How to Contribute:
+==================
+Contributions are welcome! When contributing to Cheater:
+1. Maintain GPLv3 compliance
+2. Respect the original Arsenal project
+3. Follow the existing code style
+4. Document your changes
+5. Test thoroughly before submitting
+
+Questions and Support:
+======================
+For issues or questions, please use the GitHub issue tracker.
+Ensure you're using the latest version before reporting bugs.

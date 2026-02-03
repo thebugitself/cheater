@@ -1,0 +1,39 @@
+NOTICE
+
+Cheater
+Copyright (c) 2025 lainonz
+
+This product is a derivative work of Arsenal, and is licensed under 
+the GNU General Public License v3.0 (GPLv3).
+
+Original Work:
+===============
+Arsenal - A command launcher for penetration testers
+Copyright (c) Orange Cyberdefense
+https://github.com/Orange-Cyberdefense/arsenal
+Licensed under GPLv3
+
+Derivative Work Changes:
+========================
+- Modern terminal UI improvements
+- Enhanced configuration system with config/config.py
+- Support for multiple cheatsheet formats (Markdown, ReStructuredText, YAML)
+- Improved navigation and user experience
+- Code refactoring and bug fixes
+- Additional features and utilities
+
+License Information:
+====================
+This product is licensed under the GNU General Public License v3.0.
+See the LICENSE file for the complete license text.
+
+As per GPLv3 requirements:
+- Source code is freely available
+- Modifications are permitted
+- Derivative works must also be licensed under GPLv3
+- The original copyright notice and license must be preserved
+
+Attribution:
+=============
+Both the original Arsenal project and derivative work Cheater are
+open source projects created to benefit the cybersecurity community.
