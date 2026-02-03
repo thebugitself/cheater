@@ -29,17 +29,12 @@ faketime "$(rdate -n <IP> -p | awk '{print $2, $3, $4}' | date -f - "+%Y-%m-%d %
 ```bash
 mkdir -p loot/smb/unauth
 TARGET=<IP>
-echo "Guest Login Enumeration"
 nxc smb $TARGET -u 'a' -p '' --smb-timeout 10 --shares > $(pwd)/loot/smb/unauth/guest_shares.txt
 nxc smb $TARGET -u 'a' -p '' --smb-timeout 10 --rid-brute > $(pwd)/loot/smb/unauth/guest_rid_brute.txt
 nxc smb $TARGET -u 'a' -p '' --smb-timeout 10 --users > $(pwd)/loot/smb/unauth/guest_users.txt
-echo "-------------"
-echo "Null Session Enumeration"
 nxc smb $TARGET -u '' -p '' --smb-timeout 10 --shares > loot/smb/unauth/null_shares.txt
 nxc smb $TARGET -u '' -p '' --smb-timeout 10 --rid-brute > loot/smb/unauth/null_rid_brute.txt
 nxc smb $TARGET -u '' -p '' --smb-timeout 10 --users > loot/smb/unauth/null_users.txt
-echo "-------------"
-echo "All information saved to loot/smb/unauth/"
 unset TARGET
 ```
 

@@ -90,6 +90,22 @@ class CheatslistMenu:
         infowin.refresh()
         return infowin
 
+    def draw_shortcut_hints(self):
+        """
+        Draw shortcut hints above the search bar
+        :return: the window created
+        """
+        y, x = 4, 0
+        ncols, nlines = self.width, 1
+        hintwin = curses.newwin(nlines, ncols, y, x)
+        hint_text = "Shift+G: Global Options"
+        try:
+            hintwin.addstr(hint_text, curses.color_pair(Gui.INFO_DESC_COLOR))
+        except:
+            pass  # Silently fail if text doesn't fit
+        hintwin.refresh()
+        return hintwin
+
     def draw_editbox(self):
         """
         Draw the edition box (in the right of the prompt box
@@ -258,6 +274,8 @@ class CheatslistMenu:
         self.draw_prompt()
         # create info windows
         self.draw_infobox()
+        # create shortcut hints
+        self.draw_shortcut_hints()
         # create cheatslist box
         self.draw_cheatslistbox()
         # draw footer
@@ -496,7 +514,7 @@ class FilePicker:
             draw_custom_border(stdscr, start_y, start_x, box_height, box_width)
             
             # Title
-            title = " File Picker (Ctrl+F) "
+            title = " File Picker (@) "
             title_x = start_x + max(1, (box_width - len(title)) // 2)
             stdscr.addstr(start_y, title_x, title, curses.A_BOLD)
             
@@ -1029,11 +1047,11 @@ class ArgslistMenu:
         description_lines = Gui.cmd.get_description_cut_by_size(ncols - (padding_text_border * 2))
 
         border_height = 1
-        cmd_height = 1 + nbpreviewnewlines
+        cmd_height = 2 + nbpreviewnewlines
         args_height = (2 + Gui.cmd.nb_args) if (Gui.cmd.nb_args > 0) else 0
         desc_height = (len(description_lines) + 1 + 1) if (len(description_lines) > 0) else 0
 
-        cmd_pos = 1
+        cmd_pos = 2
         args_pos = border_height + cmd_height + 1
         desc_pos = args_pos + args_height - 1
 
@@ -1053,13 +1071,20 @@ class ArgslistMenu:
             # draw description
             self.draw_desc_preview(argprev, padding_text_border, desc_pos, description_lines)
             
-            # Show current working directory at bottom of args box
-            cwd_info = f" CWD: {config.ORIGINAL_CWD} "
-            if len(cwd_info) < ncols - 4:
-                try:
-                    argprev.addstr(nlines - 1, 2, cwd_info, curses.color_pair(Gui.INFO_DESC_COLOR))
-                except:
-                    pass  # Ignore if it doesn't fit
+            # Show @ shortcut info and CWD on the top inside row (reserved)
+            file_picker_info = "@: File Picker"
+            cwd_info = f"CWD: {config.ORIGINAL_CWD}"
+            info_row = 1
+            info_x = padding_text_border
+            try:
+                if 1 <= info_row < nlines - 1:
+                    argprev.addstr(info_row, info_x, file_picker_info, curses.color_pair(Gui.INFO_DESC_COLOR))
+                    if len(cwd_info) < ncols - 4:
+                        argprev.addstr(info_row, ncols - len(cwd_info) - 2, cwd_info,
+                                       curses.color_pair(Gui.INFO_DESC_COLOR))
+                argprev.refresh()
+            except:
+                pass  # Ignore if it doesn't fit
 
             if len(Gui.cmd.args) > 0:
                 self.draw_args_list(args_pos)
