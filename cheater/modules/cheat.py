@@ -442,9 +442,13 @@ class Cheats:
             "yml": self.parse_yaml
         }
         paths = [paths] if isinstance(paths, str) else paths
-        # Directories to exclude from scanning
-        exclude_dirs = {'env', 'venv', '.env', '.venv', 'site-packages', 
-                       '__pycache__', '.git', 'node_modules', 'dist', 'build'}
+        
+        # Import exclude_dirs from config
+        from . import config
+        exclude_dirs = getattr(config, 'EXCLUDE_DIRS', {
+            'env', 'venv', '.env', '.venv', 'site-packages', '__pycache__', 
+            '.git', 'node_modules', 'dist', 'build', '.eggs'
+        })
         
         for path in paths:
             for file_format in file_formats:

@@ -19,6 +19,12 @@ A modern pentesting command launcher with improved features and clean interface.
 - Global options menu (Shift+G)
 - Support for markdown, rst, and yml cheatsheets
 
+⚙️ **Easy Configuration**
+- Simple Python config file in `config/config.py`
+- Just edit variables directly - no complex tools needed
+- Configure cheatsheet paths, formats, exclusions, and more
+- See [config/README.md](config/README.md) for guide
+
 ## Installation
 
 ```bash
@@ -29,9 +35,31 @@ cd cheater
 # Install dependencies
 pip3 install -r requirements.txt
 
+# Setup configuration (optional but recommended)
+./setup_config.sh
+
 # Run cheater
 ./run
 ```
+
+## Configuration
+
+Cheater now supports configuration files! Configure your cheatsheet paths, formats, and behavior without editing source code.
+
+```bash
+# Quick setup
+./setup_config.sh
+
+# View configuration
+python3 cheater_config.py show
+
+# Edit configuration
+python3 cheater_config.py edit
+```
+
+**Config file location:** `~/.config/cheater/config.yml`
+
+See [CONFIGURATION.md](CONFIGURATION.md) for complete documentation.
 
 ## Usage
 
