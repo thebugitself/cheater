@@ -1,0 +1,5 @@
+docutils>=0.16
+pyperclip>=1.8.0
+PyYAML>=5.3
+pyfzf>=0.3.1
+libtmux>=0.8.5
