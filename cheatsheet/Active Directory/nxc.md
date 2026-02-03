@@ -116,3 +116,10 @@ Note: Use Shift+O to select authentication method
 ```bash
 nxc smb <IP> -u <Username> <Creds_Options|-p|-H|-k -p> <Password> --generate-tgt <Username>
 ```
+
+## nxc - Get Domain Users (--users/--users-export ldap)
+#plateform/linux #target/remote #port/389 #protocol/ldap #cat/RECON
+
+```bash
+nxc ldap <IP> -u <Username> <Creds_Options|-p|-H|-k -p> <Password> --users-export domain_users.txt
+```
