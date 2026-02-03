@@ -13,6 +13,29 @@ from . import config
 from . import command
 
 
+def draw_custom_border(window, y, x, height, width):
+    """
+    Draw a custom ASCII border on a window using +, -, | characters.
+    Used for consistent styling across all UI elements.
+    """
+    try:
+        win_height, win_width = window.getmaxyx()
+        for row in range(y, min(y + height, win_height)):
+            for col in range(x, min(x + width, win_width)):
+                if row == y or row == y + height - 1:
+                    # Top and bottom border
+                    if col == x or col == x + width - 1:
+                        window.addstr(row, col, "+")
+                    else:
+                        window.addstr(row, col, "-")
+                elif col == x or col == x + width - 1:
+                    # Left and right border
+                    window.addstr(row, col, "|")
+    except (curses.error, ValueError):
+        # Silently fail if coordinates are invalid (terminal too small, etc)
+        pass
+
+
 class CheatslistMenu:
     globalcheats = []  # all cheats
     cheats = []  # cheats after search
@@ -62,7 +85,8 @@ class CheatslistMenu:
         cwd_text = f"CWD: {config.ORIGINAL_CWD}"
         if len(cwd_text) < self.width - 4:
             infowin.addstr(y, self.width - len(cwd_text) - 2, cwd_text, curses.color_pair(Gui.INFO_DESC_COLOR))
-        infowin.border()
+        # Draw custom border
+        draw_custom_border(infowin, 0, 0, nlines, ncols)
         infowin.refresh()
         return infowin
 
@@ -468,16 +492,8 @@ class FilePicker:
             start_y = max(0, (height - box_height) // 2)
             start_x = max(0, (width - box_width) // 2)
             
-            # Draw border
-            for y in range(start_y, start_y + box_height):
-                for x in range(start_x, start_x + box_width):
-                    if y == start_y or y == start_y + box_height - 1:
-                        if x == start_x or x == start_x + box_width - 1:
-                            stdscr.addstr(y, x, "+")
-                        else:
-                            stdscr.addstr(y, x, "-")
-                    elif x == start_x or x == start_x + box_width - 1:
-                        stdscr.addstr(y, x, "|")
+            # Draw border using custom function
+            draw_custom_border(stdscr, start_y, start_x, box_height, box_width)
             
             # Title
             title = " File Picker (Ctrl+F) "
@@ -638,18 +654,8 @@ class GlobalOptionsMenu:
             start_y = max(0, (height - box_height) // 2)
             start_x = max(0, (width - box_width) // 2)
             
-            # Draw border directly on stdscr
-            for y in range(start_y, start_y + box_height):
-                for x in range(start_x, start_x + box_width):
-                    if y == start_y or y == start_y + box_height - 1:
-                        # Top and bottom border
-                        if x == start_x or x == start_x + box_width - 1:
-                            stdscr.addstr(y, x, "+")
-                        else:
-                            stdscr.addstr(y, x, "-")
-                    elif x == start_x or x == start_x + box_width - 1:
-                        # Left and right border
-                        stdscr.addstr(y, x, "|")
+            # Draw border using custom function
+            draw_custom_border(stdscr, start_y, start_x, box_height, box_width)
             
             # Title
             title = " Global Options (Shift+G) "
@@ -666,7 +672,6 @@ class GlobalOptionsMenu:
                 y = start_y + 2 + idx
                 if y >= start_y + box_height - 3:
                     break
-                    
                 # Variable name
                 var_label = f"{var}:"
                 stdscr.addstr(y, start_x + 2, var_label.ljust(15))
@@ -979,7 +984,10 @@ class ArgslistMenu:
                 else:
                     # else in white
                     self.draw_preview_part(argprev, arg, curses.color_pair(Gui.BASIC_COLOR))
-        argprev.border()
+        
+        # Draw custom border
+        height, width = argprev.getmaxyx()
+        draw_custom_border(argprev, 0, 0, height, width)
         argprev.refresh()
 
     def draw(self, stdscr):
