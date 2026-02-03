@@ -618,8 +618,8 @@ class GlobalOptionsMenu:
     def __init__(self, prev):
         self.previous_menu = prev
         # Load existing values
-        if exists(config.savevarfile):
-            with open(config.savevarfile, 'r') as f:
+        if exists(config.SAVEVARFILE):
+            with open(config.SAVEVARFILE, 'r') as f:
                 self.values = json.load(f)
         # Initialize missing fields
         for var in self.common_vars:
@@ -714,7 +714,7 @@ class GlobalOptionsMenu:
         """Save values to config file"""
         # Remove empty values
         filtered_values = {k: v for k, v in self.values.items() if v}
-        with open(config.savevarfile, 'w') as f:
+        with open(config.SAVEVARFILE, 'w') as f:
             json.dump(filtered_values, f, indent=2)
         # Update Gui global vars
         Gui.cheaterGlobalVars = filtered_values
