@@ -1150,20 +1150,29 @@ class ArgslistMenu:
         # update cursor position
         self.xcursor = self.x_init + len(autocompleted_argument)
 
-    def open_choice_popup(self, stdscr):
+    def _find_arg_index(self, arg_name):
+        for i, arg in enumerate(Gui.cmd.args):
+            if arg[0] == arg_name:
+                return i
+        return None
+
+    def open_choice_popup(self, stdscr, arg_index=None):
         """
-        Open a popup to select from predefined choices for the current argument
+        Open a popup to select from predefined choices for a given argument
         """
-        choices = getattr(Gui.cmd, 'arg_choices', {}).get(self.current_arg)
+        if arg_index is None:
+            arg_index = self.current_arg
+        choices = getattr(Gui.cmd, 'arg_choices', {}).get(arg_index)
         if not choices:
             return False
 
-        labels = getattr(Gui.cmd, 'arg_choice_labels', {}).get(self.current_arg)
+        labels = getattr(Gui.cmd, 'arg_choice_labels', {}).get(arg_index)
         display_items = labels if labels and len(labels) == len(choices) else choices
 
         height, width = stdscr.getmaxyx()
-        box_width = min(max(len(item) for item in display_items) + 6, width - 4)
-        box_height = min(len(display_items) + 4, height - 4)
+        max_item_len = max(len(item) for item in display_items)
+        box_width = min(max_item_len + 6, width - 2)
+        box_height = min(len(display_items) + 4, height - 2)
         start_y = (height - box_height) // 2
         start_x = (width - box_width) // 2
 
@@ -1171,7 +1180,7 @@ class ArgslistMenu:
         win.keypad(True)
 
         selected = 0
-        current_val = Gui.cmd.args[self.current_arg][1]
+        current_val = Gui.cmd.args[arg_index][1]
         if current_val in choices:
             selected = choices.index(current_val)
 
@@ -1189,9 +1198,9 @@ class ArgslistMenu:
             win.refresh()
             c = win.getch()
             if c in (curses.KEY_ENTER, 10, 13):
-                Gui.cmd.args[self.current_arg][1] = choices[selected]
+                Gui.cmd.args[arg_index][1] = choices[selected]
                 if self.x_init is not None:
-                    self.xcursor = self.x_init + len(Gui.cmd.args[self.current_arg][1])
+                    self.xcursor = self.x_init + len(Gui.cmd.args[arg_index][1])
                 return True
             if c in (27, curses.KEY_F10):
                 return False
@@ -1257,7 +1266,11 @@ class ArgslistMenu:
             elif c == ord('O'):
                 # Shift+O: Open choices popup if defined
                 if Gui.cmd.args:
-                    self.open_choice_popup(stdscr)
+                    creds_index = self._find_arg_index("Creds_Options")
+                    if creds_index is None:
+                        self.open_choice_popup(stdscr)
+                    else:
+                        self.open_choice_popup(stdscr, creds_index)
             elif c == 20:
                 try:
                     from pyfzf.pyfzf import FzfPrompt
