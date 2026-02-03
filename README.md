@@ -1,5 +1,7 @@
 # Cheater
 
+[![asciicast](https://asciinema.org/a/778814.svg)](https://asciinema.org/a/778814)
+
 A modern pentesting command launcher with improved features and clean interface.
 
 **Derivative work of [Arsenal](https://github.com/Orange-Cyberdefense/arsenal)** by Orange Cyberdefense - licensed under GPLv3.
