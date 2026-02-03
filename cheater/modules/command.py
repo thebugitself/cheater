@@ -86,34 +86,32 @@ class Command:
     def build(self):
         """
         Called after argument completion
-        -> if some args values are still empty do nothing
-        -> else build the final command string by adding args values
+        Allow empty args - they will be skipped in final command
         """
-        if self.nb_args == 0 :
+        if self.nb_args == 0:
             return True
-        argsval = []
-        # Build arg values - DON'T quote Creds_Options (needs word-splitting)
-        for i, arg in enumerate(self.args):
-            val = arg[1]
-            argsval.append(val)
         
-        if "" not in [a[1] for a in self.args]:
-            # split cmdline at each arg position
-            regex = ''.join('<' + re.escape(arg[0]) + '>|' for arg in self.args)[:-1]
-            cmdparts = re.split(regex, self.cmdline)
-            # concat command parts and arguments values to build the command
-            self.cmdline = ""
-            for i in range(len(cmdparts) + len(self.args)):
-                if i % 2 == 0:
-                    self.cmdline += cmdparts[i // 2]
-                else:
-                    self.cmdline += argsval[(i - 1) // 2]
-            # Only call curses.endwin() if curses was initialized
-            try:
-                if curses.isendwin() == False:
-                    curses.endwin()
-            except:
-                pass
+        # split cmdline at each arg position
+        regex = ''.join('<' + re.escape(arg[0]) + '>|' for arg in self.args)[:-1]
+        cmdparts = re.split(regex, self.cmdline)
+        
+        # Build command, skipping empty args
+        self.cmdline = ""
+        arg_index = 0
+        for i in range(len(cmdparts)):
+            self.cmdline += cmdparts[i]
+            # Add arg value if not at the end and arg is not empty
+            if arg_index < len(self.args):
+                if self.args[arg_index][1] != "":
+                    self.cmdline += self.args[arg_index][1]
+                arg_index += 1
+        
+        # Only call curses.endwin() if curses was initialized
+        try:
+            if curses.isendwin() == False:
+                curses.endwin()
+        except:
+            pass
 
-        # build ok ?
-        return "" not in argsval
+        # Always return True - allow empty args
+        return True
