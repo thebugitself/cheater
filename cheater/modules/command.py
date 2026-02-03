@@ -46,8 +46,11 @@ class Command:
     def get_args(self, cheat, gvars):
         """
         Process cmdline from the cheatsheet to get args names
+        Only ask once for duplicate argument names
         """
         self.args = []
+        seen_args = {}  # Track args we've already seen
+        
         # Use a list of tuples here instead of dict in case
         # the cmd has multiple args with the same name..
         for raw_arg in re.findall(r'<([^<>]+)>', cheat.command):
@@ -56,24 +59,31 @@ class Command:
                 name = parts[0]
                 options = [p for p in parts[1:] if p != ""]
                 default_val = options[0] if options else ""
-                self.args.append([name, default_val])
-                if len(options) > 1:
-                    self.arg_choices[len(self.args) - 1] = options
-                    if name == "Creds_Options":
-                        self.arg_choice_labels[len(self.args) - 1] = [
-                            "Normal Authentication (-p)",
-                            "Pass-The-Hash (-H)",
-                            "Kerberos Authentication (-p -k)",
-                        ]
+                
+                # Only add to args list if we haven't seen this arg before
+                if name not in seen_args:
+                    self.args.append([name, default_val])
+                    seen_args[name] = len(self.args) - 1
+                    if len(options) > 1:
+                        self.arg_choices[len(self.args) - 1] = options
+                        if name == "Creds_Options":
+                            self.arg_choice_labels[len(self.args) - 1] = [
+                                "Normal Authentication (-p)",
+                                "Pass-The-Hash (-H)",
+                                "Kerberos Authentication (-p -k)",
+                            ]
                 # Variable has been added to cheat variables before, remove it
                 cheat.command = cheat.command.replace(raw_arg, name)
                 self.cmdline = cheat.command
-            elif raw_arg in gvars:
+            elif raw_arg in gvars and raw_arg not in seen_args:
                 self.args.append([raw_arg, gvars[raw_arg]])
-            elif raw_arg in cheat.variables:
+                seen_args[raw_arg] = len(self.args) - 1
+            elif raw_arg in cheat.variables and raw_arg not in seen_args:
                 self.args.append([raw_arg, cheat.variables[raw_arg]])
-            else:
+                seen_args[raw_arg] = len(self.args) - 1
+            elif raw_arg not in seen_args:
                 self.args.append([raw_arg, ""])
+                seen_args[raw_arg] = len(self.args) - 1
 
     def get_command_parts(self):
         if self.nb_args != 0:
@@ -91,8 +101,13 @@ class Command:
         """
         if self.nb_args == 0 :
             return True
-        argsval = [a[1] for a in self.args]
-        if "" not in argsval:
+        argsval = []
+        # Build arg values - DON'T quote Creds_Options (needs word-splitting)
+        for i, arg in enumerate(self.args):
+            val = arg[1]
+            argsval.append(val)
+        
+        if "" not in [a[1] for a in self.args]:
             # split cmdline at each arg position
             regex = ''.join('<' + re.escape(arg[0]) + '>|' for arg in self.args)[:-1]
             cmdparts = re.split(regex, self.cmdline)
