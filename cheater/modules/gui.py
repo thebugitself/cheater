@@ -1171,7 +1171,7 @@ class ArgslistMenu:
 
         height, width = stdscr.getmaxyx()
         max_item_len = max(len(item) for item in display_items)
-        box_width = min(max_item_len + 6, width - 2)
+        box_width = min(max_item_len + 10, width - 2)
         box_height = min(len(display_items) + 4, height - 2)
         start_y = (height - box_height) // 2
         start_x = (width - box_width) // 2
