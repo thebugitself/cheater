@@ -65,9 +65,8 @@ class Command:
                             "Pass-The-Hash (-H)",
                             "Kerberos Authentication (-k -p)",
                         ]
-                # Variable has been added to cheat variables before, remove it
-                cheat.command = cheat.command.replace(raw_arg, name)
-                self.cmdline = cheat.command
+                # Clean cmdline for display (remove options part, keep only name)
+                self.cmdline = self.cmdline.replace(f'<{raw_arg}>', f'<{name}>')
             elif raw_arg in gvars:
                 self.args.append([raw_arg, gvars[raw_arg]])
             elif raw_arg in cheat.variables:

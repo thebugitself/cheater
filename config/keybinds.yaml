@@ -1,0 +1,106 @@
+# Keybinding Configuration for Cheater Tool
+# 
+# Simple and easy format:
+# 
+# For Ctrl:       Ctrl, <key>    example: Ctrl, G
+# For Alt:        Alt, <key>     example: Alt, G
+# For Shift:      Shift, <key>   example: Shift, G
+# For F-keys:     F1 to F12      example: F2
+# For characters: '<char>'       example: ';' or ':' or 'a'
+# 
+# Notes:
+# - Alt keys may conflict with terminal emulators (like Zellij)
+# - Shift + letter = uppercase letter, so Shift, G is the same as 'G'
+# - For special characters that need Shift (like : @ # etc), 
+#   just write the character in quotes: ':'
+#
+# After changing this file, restart the application to apply changes.
+
+# Main CheatsList Menu Keybindings
+CheatsListKeys:
+  # Open Global Options menu
+  # Options: Ctrl, G | Alt, G | Shift, G | F1-F12 | ';'
+  Global_Options: F1
+  
+  # Tab for autocomplete (usually don't change)
+  Tab_Complete: Tab
+
+
+# ArgslistMenu Keybindings
+ArgsListKeys:
+  # Tab to move to next argument or autocomplete
+  # (usually don't change)
+  Tab: Tab
+  
+  # Open file picker
+  # Options: Ctrl, F | Alt, F | Shift, F | F1-F12 | ';'
+  File_Picker: F2
+  
+  # Open authentication choice popup
+  # Options: Ctrl, O | Alt, O | Shift, O | F1-F12 | ':'
+  Auth_Choice: F3
+  
+  # Fuzzy finder (fzf) integration
+  # Options: Ctrl, T | Alt, T | Shift, T | F1-F12 | '\'
+  # Fuzzy_Finder: Shift, T
+
+# Labels displayed in UI
+# Free format, adjust according to keybindings above
+KeyLabels:
+  Global_Options: "F1: Global Options"
+  File_Picker: "F2: File Picker"
+  Auth_Choice: "F3: Auth choice"
+
+
+# ============================================================================
+# ALTERNATIVE CONFIGURATION EXAMPLES
+# ============================================================================
+# Uncomment and adjust if you want to use different keybindings
+
+# # Example 1: Using Function Keys
+# CheatsListKeys:
+#   Global_Options: F2
+#   Tab_Complete: Tab
+# 
+# ArgsListKeys:
+#   Tab: Tab
+#   File_Picker: F3
+#   Auth_Choice: F4
+#   Fuzzy_Finder: F5
+# 
+# KeyLabels:
+#   Global_Options: "F2: Global Options"
+#   File_Picker: "F3: File Picker"
+#   Auth_Choice: "F4: Auth choice"
+
+# # Example 2: Using regular characters (semicolon, colon, etc)
+# CheatsListKeys:
+#   Global_Options: Shift, G
+#   Tab_Complete: Tab
+# 
+# ArgsListKeys:
+#   Tab: Tab
+#   File_Picker: ';'
+#   Auth_Choice: ':'
+#   Fuzzy_Finder: '\'
+# 
+# KeyLabels:
+#   Global_Options: "Shift+G: Global Options"
+#   File_Picker: ";: File Picker"
+#   Auth_Choice: ":: Auth choice"
+
+# # Example 3: Mixed configuration
+# CheatsListKeys:
+#   Global_Options: F1
+#   Tab_Complete: Tab
+# 
+# ArgsListKeys:
+#   Tab: Tab
+#   File_Picker: ';'
+#   Auth_Choice: Ctrl, O
+#   Fuzzy_Finder: F6
+# 
+# KeyLabels:
+#   Global_Options: "F1: Global Options"
+#   File_Picker: ";: File Picker"
+#   Auth_Choice: "Ctrl+O: Auth choice"

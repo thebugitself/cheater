@@ -11,6 +11,13 @@ import glob
 # local
 from . import config
 from . import command
+# Import keybinds module
+import sys
+import os
+_keybinds_path = os.path.join(os.path.dirname(__file__), '..', '..', 'config')
+if _keybinds_path not in sys.path:
+    sys.path.insert(0, _keybinds_path)
+import keybinds
 
 
 def draw_custom_border(window, y, x, height, width):
@@ -98,7 +105,7 @@ class CheatslistMenu:
         y, x = 4, 0
         ncols, nlines = self.width, 1
         hintwin = curses.newwin(nlines, ncols, y, x)
-        hint_text = "Shift+G: Global Options"
+        hint_text = keybinds.KeyLabels.GLOBAL_OPTIONS
         try:
             hintwin.addstr(hint_text, curses.color_pair(Gui.INFO_DESC_COLOR))
         except:
@@ -387,8 +394,8 @@ class CheatslistMenu:
             elif c == 338 or c == curses.KEY_NPAGE:
                 # Page DOWN
                 self.move_page(1)
-            elif c == ord('G'):
-                # Shift+G - Open global options
+            elif c == keybinds.CheatsListKeys.GLOBAL_OPTIONS:
+                # Open global options
                 try:
                     global_menu = GlobalOptionsMenu(self)
                     global_menu.run(stdscr)
@@ -403,7 +410,7 @@ class CheatslistMenu:
                     stdscr.refresh()
                     stdscr.getch()
                     stdscr.clear()
-            elif c == 9:
+            elif c == keybinds.CheatsListKeys.TAB_COMPLETE:
                 # TAB cmd auto complete
                 if self.input_buffer != "":
                     predictions = []
@@ -676,7 +683,8 @@ class GlobalOptionsMenu:
             draw_custom_border(stdscr, start_y, start_x, box_height, box_width)
             
             # Title
-            title = " Global Options (Shift+G) "
+            key_name = keybinds.get_key_name(keybinds.CheatsListKeys.GLOBAL_OPTIONS)
+            title = f" Global Options ({key_name}) "
             title_x = start_x + max(1, (box_width - len(title)) // 2)
             stdscr.addstr(start_y, title_x, title, curses.A_BOLD)
             
@@ -1055,15 +1063,6 @@ class ArgslistMenu:
         # draw argslist menu popup
         self.prev_lastline_len = 0
         nbpreviewnewlines = self.get_nb_preview_new_lines()
-        # if Gui.cmd.nb_args != 0:
-        #     nbpreviewnewlines = self.get_nb_preview_new_lines()
-        # else:
-        #     nbpreviewnewlines = 0
-
-        # -------------- border
-        # cmd
-        # nbpreviewnewlines
-        # .............. args margin top
         # args
         # ------
         # description
@@ -1104,11 +1103,11 @@ class ArgslistMenu:
             # draw description
             self.draw_desc_preview(argprev, padding_text_border, desc_pos, description_lines)
             
-            # Show @ shortcut info and CWD on the top inside row (reserved)
+            # Show Ctrl+F shortcut info and CWD on the top inside row (reserved)
             has_choices = bool(getattr(Gui.cmd, 'arg_choices', {}))
-            file_picker_info = "@: File Picker"
+            file_picker_info = keybinds.KeyLabels.FILE_PICKER
             if has_choices:
-                file_picker_info += " | Shift+O: Auth choice"
+                file_picker_info += " | " + keybinds.KeyLabels.AUTH_CHOICE
             cwd_info = f"CWD: {config.ORIGINAL_CWD}"
             info_row = 1
             info_x = padding_text_border
@@ -1282,7 +1281,7 @@ class ArgslistMenu:
                 self.next_arg()
             elif c == curses.KEY_UP:
                 self.previous_arg()
-            elif c == 9:
+            elif c == keybinds.ArgsListKeys.TAB:
                 if Gui.cmd.args:
                     # autocomplete the current argument
                     if Gui.cmd.args[self.current_arg][1]:
@@ -1290,8 +1289,8 @@ class ArgslistMenu:
                     # go to the next argument
                     else:
                         self.next_arg()
-            elif c == ord('@'):
-                # @: Open file picker
+            elif c == keybinds.ArgsListKeys.FILE_PICKER:
+                # Open file picker
                 if Gui.cmd.args:
                     try:
                         file_picker = FilePicker(config.ORIGINAL_CWD)
@@ -1310,15 +1309,15 @@ class ArgslistMenu:
                         stdscr.clear()
                     except Exception as e:
                         pass  # Silently fail if file picker has issues
-            elif c == ord('O'):
-                # Shift+O: Open choices popup if defined
+            elif c == keybinds.ArgsListKeys.AUTH_CHOICE:
+                # Open choices popup if defined
                 if Gui.cmd.args:
                     creds_index = self._find_arg_index("Creds_Options")
                     if creds_index is None:
                         self.open_choice_popup(stdscr)
                     else:
                         self.open_choice_popup(stdscr, creds_index)
-            elif c == 20:
+            elif c == keybinds.ArgsListKeys.FUZZY_FINDER:
                 try:
                     from pyfzf.pyfzf import FzfPrompt
                     files = []
