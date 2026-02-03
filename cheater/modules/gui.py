@@ -881,31 +881,45 @@ class ArgslistMenu:
 
     def next_arg(self):
         """
-        Select the next argument in the list
+        Select the next argument in the list, skip duplicates
         """
         # reset cursor position
         self.xcursor = None
         self.x_init = None
         self.y_init = None
-        # change selected arg
-        if self.current_arg < Gui.cmd.nb_args - 1:
-            self.current_arg += 1
-        else:
-            self.current_arg = 0
+        # change selected arg and skip duplicates
+        start = self.current_arg
+        while True:
+            if self.current_arg < Gui.cmd.nb_args - 1:
+                self.current_arg += 1
+            else:
+                self.current_arg = 0
+            # Check if this arg name was already seen before this position
+            arg_name = Gui.cmd.args[self.current_arg][0]
+            is_duplicate = any(Gui.cmd.args[i][0] == arg_name for i in range(self.current_arg))
+            if not is_duplicate or self.current_arg == start:
+                break
 
     def previous_arg(self):
         """
-        Select the previous argument in the list
+        Select the previous argument in the list, skip duplicates
         """
         # reset cursor position
         self.xcursor = None
         self.x_init = None
         self.y_init = None
-        # change selected arg
-        if self.current_arg > 0:
-            self.current_arg -= 1
-        else:
-            self.current_arg = Gui.cmd.nb_args - 1
+        # change selected arg and skip duplicates
+        start = self.current_arg
+        while True:
+            if self.current_arg > 0:
+                self.current_arg -= 1
+            else:
+                self.current_arg = Gui.cmd.nb_args - 1
+            # Check if this arg name was already seen before this position
+            arg_name = Gui.cmd.args[self.current_arg][0]
+            is_duplicate = any(Gui.cmd.args[i][0] == arg_name for i in range(self.current_arg))
+            if not is_duplicate or self.current_arg == start:
+                break
 
     def draw_preview_part(self, win, text, color):
         """
@@ -933,7 +947,15 @@ class ArgslistMenu:
         """
         Draw the selected argument line in the argument menu
         """
-        y, x = self.AB_TOP + y_pos + self.current_arg, self.AB_SIDE + 1
+        # Calculate display position based on unique args only
+        unique_position = 0
+        for i in range(self.current_arg):
+            arg_name = Gui.cmd.args[i][0]
+            # Check if this is the first occurrence of this arg name
+            if not any(Gui.cmd.args[j][0] == arg_name for j in range(i)):
+                unique_position += 1
+        
+        y, x = self.AB_TOP + y_pos + unique_position, self.AB_SIDE + 1
         ncols, nlines = self.width - 2 * (self.AB_SIDE + 1), 1
         arg = Gui.cmd.args[self.current_arg]
         max_size = self.max_preview_size - 4 - len(arg[0])
@@ -945,12 +967,20 @@ class ArgslistMenu:
 
     def draw_args_list(self, y_pos):
         """
-        Draw the asked arguments list in the argument menu
+        Draw the asked arguments list in the argument menu (only unique args)
         """
-        y, x = self.AB_TOP + y_pos, self.AB_SIDE + 1
-        ncols, nlines = self.width - 2 * (self.AB_SIDE + 1), Gui.cmd.nb_args + 1
-        argwin = curses.newwin(nlines, ncols, y, x)
+        # Get unique args (skip duplicates)
+        unique_args = []
+        seen_names = set()
         for arg in Gui.cmd.args:
+            if arg[0] not in seen_names:
+                unique_args.append(arg)
+                seen_names.add(arg[0])
+        
+        y, x = self.AB_TOP + y_pos, self.AB_SIDE + 1
+        ncols, nlines = self.width - 2 * (self.AB_SIDE + 1), len(unique_args) + 1
+        argwin = curses.newwin(nlines, ncols, y, x)
+        for arg in unique_args:
             max_size = self.max_preview_size + 4
             argline = Gui.draw_string("     {} = {}".format(*arg), max_size) + "\n"
             argwin.addstr(argline, curses.color_pair(Gui.BASIC_COLOR))
@@ -1046,9 +1076,12 @@ class ArgslistMenu:
         # prepare showed description
         description_lines = Gui.cmd.get_description_cut_by_size(ncols - (padding_text_border * 2))
 
+        # Count unique args only for display
+        unique_arg_count = len(set(arg[0] for arg in Gui.cmd.args))
+
         border_height = 1
         cmd_height = 2 + nbpreviewnewlines
-        args_height = (2 + Gui.cmd.nb_args) if (Gui.cmd.nb_args > 0) else 0
+        args_height = (2 + unique_arg_count) if (unique_arg_count > 0) else 0
         desc_height = (len(description_lines) + 1 + 1) if (len(description_lines) > 0) else 0
 
         cmd_pos = 2
@@ -1147,8 +1180,19 @@ class ArgslistMenu:
 
         # autocomplete the argument 
         Gui.cmd.args[self.current_arg][1] = autocompleted_argument
+        # Sync to duplicates
+        self._sync_duplicate_args(self.current_arg, autocompleted_argument)
         # update cursor position
         self.xcursor = self.x_init + len(autocompleted_argument)
+
+    def _sync_duplicate_args(self, arg_index, new_value):
+        """
+        Sync value to all duplicate arguments with same name
+        """
+        arg_name = Gui.cmd.args[arg_index][0]
+        for i, arg in enumerate(Gui.cmd.args):
+            if arg[0] == arg_name:
+                Gui.cmd.args[i][1] = new_value
 
     def _find_arg_index(self, arg_name):
         for i, arg in enumerate(Gui.cmd.args):
@@ -1199,12 +1243,14 @@ class ArgslistMenu:
             c = win.getch()
             if c in (curses.KEY_ENTER, 10, 13):
                 Gui.cmd.args[arg_index][1] = choices[selected]
+                # Sync to all duplicate args
+                self._sync_duplicate_args(arg_index, choices[selected])
                 if self.x_init is not None:
-                    self.xcursor = self.x_init + len(Gui.cmd.args[arg_index][1])
+                    self.xcursor = self.x_init + len(Gui.cmd.args[self.current_arg][1])
                 return True
-            if c in (27, curses.KEY_F10):
+            elif c in (27, curses.KEY_F10):
                 return False
-            if c == curses.KEY_UP:
+            elif c == curses.KEY_UP:
                 selected = (selected - 1) % len(display_items)
             elif c == curses.KEY_DOWN:
                 selected = (selected + 1) % len(display_items)
@@ -1254,9 +1300,10 @@ class ArgslistMenu:
                             # Append selected file to current argument
                             current_value = Gui.cmd.args[self.current_arg][1]
                             if current_value and not current_value.endswith(' '):
-                                Gui.cmd.args[self.current_arg][1] = current_value + ' ' + file_picker.selected_file
+                                new_val = current_value + ' ' + file_picker.selected_file
                             else:
-                                Gui.cmd.args[self.current_arg][1] = current_value + file_picker.selected_file
+                                new_val = current_value + file_picker.selected_file
+                            self._sync_duplicate_args(self.current_arg, new_val)
                             # Update cursor position
                             self.xcursor = self.x_init + len(Gui.cmd.args[self.current_arg][1])
                         # Redraw args menu
@@ -1278,8 +1325,8 @@ class ArgslistMenu:
                     for fuzz_dir in config.FUZZING_DIRS:
                         files += glob.glob(fuzz_dir, recursive=True)
                     fzf = FzfPrompt().prompt(files)
-                    # autocomplete the argument 
-                    Gui.cmd.args[self.current_arg][1] = fzf[0]
+                    # autocomplete the argument and sync
+                    self._sync_duplicate_args(self.current_arg, fzf[0])
                     # update cursor position
                     self.xcursor = self.x_init + len(fzf[0])
                 except ImportError:
@@ -1287,15 +1334,17 @@ class ArgslistMenu:
             elif c == curses.KEY_BACKSPACE or c == 127 or c == 8:
                 if self.check_move_cursor(-1):
                     i = self.xcursor - self.x_init - 1
-                    Gui.cmd.args[self.current_arg][1] = Gui.cmd.args[self.current_arg][1][:i] + \
-                                                        Gui.cmd.args[self.current_arg][1][i + 1:]
+                    new_val = Gui.cmd.args[self.current_arg][1][:i] + \
+                              Gui.cmd.args[self.current_arg][1][i + 1:]
+                    self._sync_duplicate_args(self.current_arg, new_val)
                     self.xcursor -= 1
             elif c == curses.KEY_DC or c == 127:
                 # DELETE key
                 if self.check_move_cursor(1):
                     i = self.xcursor - self.x_init - 1
-                    Gui.cmd.args[self.current_arg][1] = Gui.cmd.args[self.current_arg][1][:i + 1] + \
-                                                        Gui.cmd.args[self.current_arg][1][i + 2:]
+                    new_val = Gui.cmd.args[self.current_arg][1][:i + 1] + \
+                              Gui.cmd.args[self.current_arg][1][i + 2:]
+                    self._sync_duplicate_args(self.current_arg, new_val)
             elif c == curses.KEY_LEFT:
                 # Move cursor LEFT
                 if self.check_move_cursor(-1): self.xcursor -= 1
@@ -1310,8 +1359,9 @@ class ArgslistMenu:
                 self.xcursor = self.x_init + len(Gui.cmd.args[self.current_arg][1])
             elif 20 <= c < 127 and Gui.cmd.nb_args > 0:
                 i = self.xcursor - self.x_init
-                Gui.cmd.args[self.current_arg][1] = Gui.cmd.args[self.current_arg][1][:i] + chr(c) + \
-                                                    Gui.cmd.args[self.current_arg][1][i:]
+                new_val = Gui.cmd.args[self.current_arg][1][:i] + chr(c) + \
+                          Gui.cmd.args[self.current_arg][1][i:]
+                self._sync_duplicate_args(self.current_arg, new_val)
                 self.xcursor += 1
 
 
