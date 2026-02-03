@@ -123,3 +123,10 @@ nxc smb <IP> -u <Username> <Creds_Options|-p|-H|-k -p> <Password> --generate-tgt
 ```bash
 nxc ldap <IP> -u <Username> <Creds_Options|-p|-H|-k -p> <Password> --users-export domain_users.txt
 ```
+
+## nxc - Password spraying
+#plateform/linux #target/remote #port/445 #protocol/smb #cat/ATTACK/BRUTE-FORCE
+
+```bash
+nxc smb <IP> -u <Userlist> <Creds_Options|-p|-H|-k -p> <Password> --smb-timeout=10 --continue-on-success
+```
